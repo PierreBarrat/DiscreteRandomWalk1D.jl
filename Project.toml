@@ -1,0 +1,4 @@
+name = "DiscreteRandomWalk1D"
+uuid = "3a17ab65-1df8-4577-9ed4-1aa8b93768dd"
+authors = ["PierreBarrat <p.barrat@live.fr>"]
+version = "0.1.0"
