@@ -1,5 +1,14 @@
 module DiscreteRandomWalk1D
 
-greet() = print("Hello World!")
+using Parameters
+using StatsBase
+
+export RW
+export step!
+
+const RW = DiscreteRandomWalk1D
+
+include("objects.jl")
+include("walk.jl")
 
 end # module
