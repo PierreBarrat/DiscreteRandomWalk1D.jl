@@ -63,3 +63,46 @@ p_left(rw::SymEFRW) = 1. - p_right(rw)
 
 step_size_right(rw::SymEFRW) = (1-rw.γ) * sqrt(((1-rw.x)^2 + rw.x^2)/2)
 step_size_left(rw::SymEFRW) = step_size_right(rw)
+
+######################################################################
+######################### Boundary conditions ########################
+######################################################################
+const ABOVE = (:above, :right, :high)
+const BELOW = (:below, :left, :low)
+
+"""
+	struct AbsorbingBC
+
+Absorbing boundary condition for a `RandomWalker`. Field `sense` can be \
+`$(ABOVE)` or `$(BELOW)`.
+
+## Fields
+
+```
+A::Float64
+sense::Symbol
+```
+"""
+struct AbsorbingBC
+	A::Float64
+	sense::Symbol
+end
+
+
+function isabsorbed(rw::RandomWalker, ABCs::Vararg{AbsorbingBC})
+	for abc in ABCs
+		if isabsorbed(rw, abc)[1]
+			return true, abc
+		end
+	end
+	return false, nothing
+end
+function isabsorbed(rw::RandomWalker, ABC::AbsorbingBC)
+	if in(ABC.sense, ABOVE) && rw.x >= ABC.A
+		return true, ABC
+	elseif in(ABC.sense, BELOW) && rw.x <= ABC.A
+		return true, ABC
+	else
+		return false, nothing
+	end
+end

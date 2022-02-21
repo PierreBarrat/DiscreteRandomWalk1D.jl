@@ -16,21 +16,40 @@ function step!(rw::RandomWalker)
 end
 
 """
-	trajectory!(rw, N, n=1)
+	trajectory!(rw, N, ABC::Vararg{AbsorbingBC}; Δn=1)
 
-Return trajectory of random walker for `N` steps, sampled every `n`.
+Return trajectory of random walker for `N` steps, sampled every `Δn`. Stop if the walk\
+	meets one of the absorbing boundary conditions `ABC`.
 """
-function trajectory!(rw, N, Δn=1)
+function trajectory!(rw, N, ABC, ABCs::Vararg{AbsorbingBC}; Δn=1)
 	X = Vector{Float64}(undef, Int(floor(N/Δn)) + 1)
-	X[1] = rw.x
-
-	n = Δn
-	i = 2
+	local abc = nothing
+	n = 0
+	i = 1
 	while n <= N
+		X[i] = rw.x
+		i += 1
+		# Check whether `rw` found an absorbing condition
+		f, abc = isabsorbed(rw, ABC, ABCs...)
+		f && break
+		# Step
 		for j in 1:Δn
 			step!(rw)
 		end
+		n += Δn
+	end
+
+	return X[1:(i-1)], 0:Δn:n, abc
+end
+function trajectory!(rw, N; Δn=1)
+	X = Vector{Float64}(undef, Int(floor(N/Δn)) + 1)
+	n = 0
+	i = 1
+	while n <= N
 		X[i] = rw.x
+		for j in 1:Δn
+			step!(rw)
+		end
 		i += 1
 		n += Δn
 	end
