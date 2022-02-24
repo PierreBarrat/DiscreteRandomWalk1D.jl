@@ -1,5 +1,6 @@
 module DiscreteRandomWalk1D
 
+using Distributions
 using Parameters
 using StatsBase
 

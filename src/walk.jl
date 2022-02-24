@@ -39,7 +39,7 @@ function trajectory!(rw, N, ABC, ABCs::Vararg{AbsorbingBC}; Δn=1)
 		n += Δn
 	end
 
-	return X[1:(i-1)], 0:Δn:n, abc
+	return X[1:(i-1)], 0:Δn:min(N,n), abc
 end
 function trajectory!(rw, N; Δn=1)
 	X = Vector{Float64}(undef, Int(floor(N/Δn)) + 1)
