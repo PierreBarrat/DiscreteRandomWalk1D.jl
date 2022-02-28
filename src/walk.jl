@@ -11,6 +11,7 @@ function step!(rw::RandomWalker)
 	else
 		rw.x -= step_size_left(rw)
 	end
+	update!(rw)
 	rw.t += 1.
 	return rw
 end
