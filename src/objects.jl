@@ -31,7 +31,20 @@ p_right(rw::EFRW) = rw.x
 p_left(rw::EFRW) = 1. - rw.x
 step_size_right(rw::EFRW) = rw.β * (1. - rw.x)
 step_size_left(rw::EFRW) = rw.β * rw.x
-update!(::EFRW) = nothing
+
+function step!(rw::EFRW)
+	p = rand()
+	if p <= rw.x
+		rw.x += rw.β * (1. - rw.x)
+	else
+		rw.x -= rw.β * rw.x
+	end
+	rw.t += 1
+	return rw
+end
+
+position(rw::EFRW) = rw.x
+pos(rw::EFRW) = rw.x
 
 """
 	mutable struct StochasticEFRW
@@ -61,42 +74,57 @@ p_right(rw::StochasticEFRW) = rw.x
 p_left(rw::StochasticEFRW) = 1. - rw.x
 step_size_right(rw::StochasticEFRW) = rw.β * (1. - rw.x)
 step_size_left(rw::StochasticEFRW) = rw.β * rw.x
-function update!(rw::StochasticEFRW)
+
+function step!(rw::StochasticEFRW)
+	p = rand()
+	if p <= rw.x
+		rw.x += rw.β * (1. - rw.x)
+	else
+		rw.x -= rw.β * rw.x
+	end
+	rw.t += 1
+	# Update β
 	rw.sval = rand(rw.s)
 	rw.β = 1. - exp(-rw.sval/rw.α)
+
+	return rw
 end
 
-"""
-	mutable struct SymEFRW
+position(rw::StochasticEFRW) = rw.x
+pos(rw::StochasticEFRW) = rw.x
 
-Approximation to `EFRW` with a symetric step size.
 
-## Fields
+# """
+# 	mutable struct SymEFRW
 
-```
-s::Float64 = 0.01
-α::Float64 = 0.01
-γ::Float64 = exp(-s/α)
-t::Int = 0
-x::Float64 = 0.
-```
-"""
-@with_kw mutable struct SymEFRW <: RandomWalker
-	s::Float64 = 0.01
-	α::Float64 = 0.01
-	γ::Float64 = exp(-s/α)
-	#
-	t::Int = 0
-	x::Float64 = 0.5
-end
+# Approximation to `EFRW` with a symetric step size.
 
-p_right(rw::SymEFRW) = (1 + (1-2*rw.x)/sqrt(2*((1-rw.x)^2 + rw.x^2)))/2
-p_left(rw::SymEFRW) = 1. - p_right(rw)
+# ## Fields
 
-step_size_right(rw::SymEFRW) = (1-rw.γ) * sqrt(((1-rw.x)^2 + rw.x^2)/2)
-step_size_left(rw::SymEFRW) = step_size_right(rw)
+# ```
+# s::Float64 = 0.01
+# α::Float64 = 0.01
+# γ::Float64 = exp(-s/α)
+# t::Int = 0
+# x::Float64 = 0.
+# ```
+# """
+# @with_kw mutable struct SymEFRW <: RandomWalker
+# 	s::Float64 = 0.01
+# 	α::Float64 = 0.01
+# 	γ::Float64 = exp(-s/α)
+# 	#
+# 	t::Int = 0
+# 	x::Float64 = 0.5
+# end
 
-update!(::SymEFRW) = nothing
+# p_right(rw::SymEFRW) = (1 + (1-2*rw.x)/sqrt(2*((1-rw.x)^2 + rw.x^2)))/2
+# p_left(rw::SymEFRW) = 1. - p_right(rw)
+
+# step_size_right(rw::SymEFRW) = (1-rw.γ) * sqrt(((1-rw.x)^2 + rw.x^2)/2)
+# step_size_left(rw::SymEFRW) = step_size_right(rw)
+
+# update!(::SymEFRW) = nothing
 
 ######################################################################
 ######################### Neutral random walk ########################
@@ -117,7 +145,24 @@ end
 step_size_left(::NeutralRW) = 0.
 update!(::NeutralRW) = nothing
 
+function step!(rw::NeutralRW)
+	rw.x = rand(Binomial(rw.N, rw.x)) / rw.N
+	rw.t = 1
+	return rw
+end
 
+position(rw::NeutralRW) = rw.x
+pos(rw::NeutralRW) = rw.x
+
+# ######################################################################
+# ########################## Neutral genealogy #########################
+# ######################################################################
+
+# @with_kw mutable struct NeutralCoalescent <: RandomWalker
+# 	N::Int = 1000
+# 	t::Int = 0
+# 	n::Int = 10
+# end
 
 
 ######################################################################

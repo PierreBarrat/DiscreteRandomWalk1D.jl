@@ -5,16 +5,19 @@ Advance `rw` by one step.
 Call `p_right` (resp. left) and `step_size_right` (resp. left).
 """
 function step!(rw::RandomWalker)
-	p = rand()
-	if p < p_right(rw)
-		rw.x += step_size_right(rw)
-	else
-		rw.x -= step_size_left(rw)
-	end
-	update!(rw)
-	rw.t += 1
-	return rw
+	@error "No `step!` method defined for $(typeof(rw))."
 end
+# function step!(rw::RandomWalker)
+# 	p = rand()
+# 	if p < p_right(rw)
+# 		rw.x += step_size_right(rw)
+# 	else
+# 		rw.x -= step_size_left(rw)
+# 	end
+# 	update!(rw)
+# 	rw.t += 1
+# 	return rw
+# end
 
 """
 	trajectory!(rw, N, ABC::Vararg{AbsorbingBC}; Δn=1)
