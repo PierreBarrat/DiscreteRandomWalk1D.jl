@@ -23,7 +23,7 @@ x::Float64 = 0.
 	s::Float64 = 0.01
 	α::Float64 = 0.01
 	β::Float64 = 1. - exp(-s/α)
-	t::Float64 = 0.
+	t::Int = 0
 	x::Float64 = 0.
 end
 
@@ -44,7 +44,7 @@ Expiring Fitness Random Walker with a randomly chosen fitness effect at each ste
 s::Distribution
 α::Float64 = 0.01
 β::Float64 = 1 - exp(-s/α)
-t::Float64 = 0.
+t::Int = 0
 x::Float64 = 0.
 ```
 """
@@ -53,7 +53,7 @@ x::Float64 = 0.
 	sval::Float64 = rand(s)
 	α::Float64 = 0.01
 	β::Float64 = 1. - exp(-sval/α)
-	t::Float64 = 0.
+	t::Int = 0
 	x::Float64 = 0.
 end
 
@@ -77,7 +77,7 @@ Approximation to `EFRW` with a symetric step size.
 s::Float64 = 0.01
 α::Float64 = 0.01
 γ::Float64 = exp(-s/α)
-t::Float64 = 0.
+t::Int = 0
 x::Float64 = 0.
 ```
 """
@@ -86,7 +86,7 @@ x::Float64 = 0.
 	α::Float64 = 0.01
 	γ::Float64 = exp(-s/α)
 	#
-	t::Float64 = 0.
+	t::Int = 0
 	x::Float64 = 0.5
 end
 
@@ -98,10 +98,13 @@ step_size_left(rw::SymEFRW) = step_size_right(rw)
 
 update!(::SymEFRW) = nothing
 
+######################################################################
+######################### Neutral random walk ########################
+######################################################################
 
 @with_kw mutable struct NeutralRW <: RandomWalker
 	N::Int = 100
-	t::Float64 = 0.
+	t::Int = 0
 	x::Float64 = 0.5
 end
 
@@ -113,6 +116,9 @@ function step_size_right(rw::NeutralRW)
 end
 step_size_left(::NeutralRW) = 0.
 update!(::NeutralRW) = nothing
+
+
+
 
 ######################################################################
 ######################### Boundary conditions ########################
