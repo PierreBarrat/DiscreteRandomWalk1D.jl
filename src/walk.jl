@@ -31,7 +31,7 @@ function trajectory!(rw, N, ABC, ABCs::Vararg{AbsorbingBC}; Δn=1)
 	n = 0
 	i = 1
 	while n <= N
-		X[i] = rw.x
+		X[i] = position(rw)
 		i += 1
 		# Check whether `rw` found an absorbing condition
 		f, abc = isabsorbed(rw, ABC, ABCs...)
@@ -50,7 +50,7 @@ function trajectory!(rw, N; Δn=1)
 	n = 0
 	i = 1
 	while n <= N
-		X[i] = rw.x
+		X[i] = position(rw)
 		for j in 1:Δn
 			step!(rw)
 		end
