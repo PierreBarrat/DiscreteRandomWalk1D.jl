@@ -14,8 +14,11 @@ Expiring Fitness Random Walker.
 ```
 s::Float64 = 0.01
 α::Float64 = 0.01
-β::Float64 = 1 - exp(-s/α)
-t::Float64 = 0.
+β::Distribution = Dirac(1. - exp(-s/α))
+ρ::Float64 = 1.
+μ::Float64 = 0.
+N::Float64 = 0
+t::Int = 0
 x::Float64 = 0.
 ```
 """
@@ -25,6 +28,7 @@ x::Float64 = 0.
 	β::Distribution = Dirac(1. - exp(-s/α))
 	ρ::Float64 = 1.
 	μ::Float64 = 0.
+	N::Float64 = 0
 	t::Int = 0
 	x::Float64 = 0.
 end
@@ -40,9 +44,16 @@ EFRW(β::Distribution; kwargs...) = EFRW(; β, kwargs...)
 EFRW(β::Number; kwargs...) = EFRW(; β = Dirac(β), kwargs...)
 
 function step!(rw::EFRW)
-	# Mutation is deterministic. To make it stochastic, I would need the population size
 	if rw.μ > 0
-		rw.x += rw.μ * (1 - 2*rw.x)
+		if rw.N > 0
+			nx = round(rw.N * rw.x) # number of individuals carrying x
+			tx = rand(Binomial(rw.N-nx, rw.μ))/rw.N # mutations to x
+			fx = rand(Binomial(nx, rw.μ))/rw.N # mutations from x
+			rw.x += tx - fx
+		else
+			# N infinite: mutations are deterministic
+			rw.x += rw.μ * (1 - 2*rw.x)
+		end
 	end
 
 	# Partial sweep
@@ -55,6 +66,11 @@ function step!(rw::EFRW)
 		else
 			rw.x -= βval * rw.x
 		end
+	end
+
+	# Binomial sampling if finite population size
+	if rw.N > 0
+		rw.x = rand(Binomial(rw.N, rw.x)) / rw.N
 	end
 
 	rw.t += 1
