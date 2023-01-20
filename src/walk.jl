@@ -22,8 +22,12 @@ end
 """
 	trajectory!(rw, N, ABC::Vararg{AbsorbingBC}; Δn=1)
 
-Return trajectory of random walker for `N` steps, sampled every `Δn`. Stop if the walk\
-	meets one of the absorbing boundary conditions `ABC`.
+Return trajectory of random walker for `N` steps, sampled every `Δn`.
+Stop if the walk meets one of the absorbing boundary conditions `ABC`.
+The return value is a tuple containing
+1. the vector of positions of the walker
+2. the corresponding time steps
+3. the absorbing boundary that ended the walk if any, nothing otherwise
 """
 function trajectory!(rw, N, ABC, ABCs::Vararg{AbsorbingBC}; Δn=1)
 	X = Vector{Float64}(undef, Int(floor(N/Δn)) + 1)
@@ -43,7 +47,7 @@ function trajectory!(rw, N, ABC, ABCs::Vararg{AbsorbingBC}; Δn=1)
 		n += Δn
 	end
 
-	return X[1:(i-1)], 0:Δn:min(N,n), abc
+	return (x = X[1:(i-1)], t = 0:Δn:min(N,n), final = abc)
 end
 function trajectory!(rw, N; Δn=1)
 	X = Vector{Float64}(undef, Int(floor(N/Δn)) + 1)
