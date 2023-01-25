@@ -12,9 +12,7 @@ Expiring Fitness Random Walker.
 ## Fields
 
 ```
-s::Float64 = 0.01
-α::Float64 = 0.01
-β::Distribution = Dirac(1. - exp(-s/α))
+β::Distribution = Dirac(0.5)
 ρ::Float64 = 1.
 μ::Float64 = 0.
 N::Float64 = 0
@@ -23,9 +21,7 @@ x::Float64 = 0.
 ```
 """
 @with_kw mutable struct EFRW <: RandomWalker
-	s::Float64 = 0.01
-	α::Float64 = 0.01
-	β::Distribution = Dirac(1. - exp(-s/α))
+	β::Distribution = Dirac(0.5)
 	ρ::Float64 = 1.
 	μ::Float64 = 0.
 	N::Float64 = 0
@@ -148,9 +144,7 @@ pos(rw::NeutralCoalescent) = position(rw)
 """
 	EFCoalescent(;
 		N::Float64 = Inf
-		s::Float64 = 0.01
-		α::Float64 = 0.01
-		β::Float64 = 1. - exp(-s/α)
+		β::Float64 = 0.5
 		ρ::Float64 = 0.05
 		t::Int = 0
 		n::Int = 10
@@ -158,9 +152,7 @@ pos(rw::NeutralCoalescent) = position(rw)
 """
 @with_kw mutable struct EFCoalescent <: RandomWalker
 	N::Float64 = Inf
-	s::Float64 = 0.01
-	α::Float64 = 0.01
-	β::Float64 = 1. - exp(-s/α)
+	β::Float64 = 0.5
 	ρ::Float64 = 0.05
 	t::Int = 0
 	n::Int = 10
