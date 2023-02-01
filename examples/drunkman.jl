@@ -58,19 +58,19 @@ begin
 	end
 end
 
-# ╔═╡ ac1c98bd-cddc-4683-ba9b-f9e588e15095
-md"""
-Now, let's have the drunk man take a walk. For this we use the `trajectory!` function. We then plot the trajectory as a function of time. 
-The following parameters are used: 
-- initial position `x0 = $(x0)`
-- probability of a step to the right: `p_right = $(p_right)`
-"""
-
 # ╔═╡ a1319200-aa76-40a5-8a9f-754582c532d9
 begin
 	x0 = 10
 	p_right = 0.52
 end;
+
+# ╔═╡ ac1c98bd-cddc-4683-ba9b-f9e588e15095
+md"""
+Now, let's have the drunk man take a walk. For this we use the `trajectory!` function. We then plot the trajectory as a function of time. 
+The following parameters are used: 
+- initial position `x0` = $(x0)
+- probability of a step to the right: `p_right` = $(p_right)
+"""
 
 # ╔═╡ a77d052c-04de-47bd-bcb7-8dc16e68c493
 X = let
