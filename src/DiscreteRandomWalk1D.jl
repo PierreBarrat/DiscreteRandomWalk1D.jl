@@ -49,7 +49,7 @@ export RW
 export RandomWalker
 export AbsorbingBC
 
-export step!, trajectory
+export step!, trajectory!
 
 const RW = DiscreteRandomWalk1D
 

@@ -104,14 +104,43 @@ To represent this, we use absorbing boundary conditions.
 # ╔═╡ 9a6c4b55-318c-496d-ad4c-1ff8ce454730
 begin
 	home = RW.AbsorbingBC(A = 0, sense = :left)
-	bar = RW.AbsorbingBC(A = 0, sense = :right)
-end
+	bar = RW.AbsorbingBC(A = 20, sense = :right)
+end;
 
 # ╔═╡ 510454c1-12cc-4b61-b673-5265246448d8
 md"""
 If the drunk man ever goes left (or below, depending on how you see it) `home.A`, he will be "absorbed" by  the boundary condition: he made it home!
 If he goes right of `bar.A`, he reached the bar. 
+
+Boundary conditions are simply added as extra arguments to `trajectory!`. 
+The output `X` of trajectory stores the final state in the field `X.final`.
 """
+
+# ╔═╡ ee379fbe-e50a-44c9-b1b9-dd20d1388b19
+X_with_boundaries = let
+	drunkman = DrunkMan(; x = x0, p_right)
+	RW.trajectory!(drunkman, 1_000, home, bar)
+end
+
+# ╔═╡ a2270eaf-d580-4d4d-8c7f-79ba9e261113
+if X_with_boundaries.final == home
+	println("Made it home! Hourra!")	
+elseif X_with_boundaries.final == bar
+	println("Reached the bar! Time for another drink!")	
+elseif isnothing(X_with_boundaries.final)
+	println("Still wandering in the streets...")
+end
+
+# ╔═╡ e785f3bc-b2c2-44da-a08c-8ea24decdd4d
+let
+	p = plot(
+		X_with_boundaries.t, X_with_boundaries.x;
+		label="", title = "Position of the drunkman", xlabel="time", ylabel="x"
+	)
+	hline!([home.A], line=(3, :green, :dash), label="Home")
+	hline!([bar.A], line=(3, :red, :dash), label="Bar")
+	plot!(legend=:outerright)
+end
 
 # ╔═╡ Cell order:
 # ╠═88e66206-a21e-11ed-119f-531ed9b4a18f
@@ -124,6 +153,9 @@ If he goes right of `bar.A`, he reached the bar.
 # ╠═a77d052c-04de-47bd-bcb7-8dc16e68c493
 # ╟─213c7d2f-b0a6-440d-b6e4-aa8effa96e20
 # ╟─85c385c3-c98a-4098-acc0-c2f5e111a8bd
-# ╠═d78a6261-63b8-4f72-8512-6ac987235041
+# ╟─d78a6261-63b8-4f72-8512-6ac987235041
 # ╠═9a6c4b55-318c-496d-ad4c-1ff8ce454730
-# ╠═510454c1-12cc-4b61-b673-5265246448d8
+# ╟─510454c1-12cc-4b61-b673-5265246448d8
+# ╠═ee379fbe-e50a-44c9-b1b9-dd20d1388b19
+# ╠═a2270eaf-d580-4d4d-8c7f-79ba9e261113
+# ╟─e785f3bc-b2c2-44da-a08c-8ea24decdd4d
