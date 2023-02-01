@@ -2,7 +2,6 @@
 	step!(rw::RandomWalker)
 
 Advance `rw` by one step.
-Call `p_right` (resp. left) and `step_size_right` (resp. left).
 """
 function step!(rw::RandomWalker)
 	@error "No `step!` method defined for $(typeof(rw))."

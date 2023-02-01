@@ -45,8 +45,11 @@ module DiscreteRandomWalk1D
 using Distributions
 
 export RW
+
 export RandomWalker
-export step!
+export AbsorbingBC
+
+export step!, trajectory
 
 const RW = DiscreteRandomWalk1D
 

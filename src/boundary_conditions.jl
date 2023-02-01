@@ -1,3 +1,5 @@
+abstract type BoundaryCondition end
+
 ######################################################################
 ######################### Boundary conditions ########################
 ######################################################################
@@ -10,6 +12,10 @@ const BELOW = (:below, :left, :low, :down)
 Absorbing boundary condition for a `RandomWalker`. The field `sense` can be \
 `$(ABOVE)` or `$(BELOW)`.
 
+A boundary condition `bc` works like this:
+- if `sense` is `:above` or similar, then `position(walker) >= bc.A` will trigger absorption
+- if `sense` is `:below` or similar, then `position(walker) <= bc.A` will trigger absorption
+
 ## Fields
 
 ```
@@ -17,7 +23,7 @@ A::T
 sense::Symbol
 ```
 """
-struct AbsorbingBC{T}
+@Base.kwdef struct AbsorbingBC{T} <: BoundaryCondition
 	A::T
 	sense::Symbol
 end
