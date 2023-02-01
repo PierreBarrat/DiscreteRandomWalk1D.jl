@@ -7,17 +7,6 @@ Call `p_right` (resp. left) and `step_size_right` (resp. left).
 function step!(rw::RandomWalker)
 	@error "No `step!` method defined for $(typeof(rw))."
 end
-# function step!(rw::RandomWalker)
-# 	p = rand()
-# 	if p < p_right(rw)
-# 		rw.x += step_size_right(rw)
-# 	else
-# 		rw.x -= step_size_left(rw)
-# 	end
-# 	update!(rw)
-# 	rw.t += 1
-# 	return rw
-# end
 
 """
 	trajectory!(rw, N, ABC::Vararg{AbsorbingBC}; Δn=1)
@@ -29,7 +18,7 @@ The return value is a tuple containing
 2. the corresponding time steps
 3. the absorbing boundary that ended the walk if any, nothing otherwise
 """
-function trajectory!(rw, N, ABC, ABCs::Vararg{AbsorbingBC}; Δn=1)
+function trajectory!(rw::RandomWalker, N, ABC, ABCs::Vararg{AbsorbingBC}; Δn=1)
 	X = Vector{Float64}(undef, Int(floor(N/Δn)) + 1)
 	local abc = nothing
 	n = 0
@@ -49,7 +38,7 @@ function trajectory!(rw, N, ABC, ABCs::Vararg{AbsorbingBC}; Δn=1)
 
 	return (x = X[1:(i-1)], t = 0:Δn:min(N,n), final = abc)
 end
-function trajectory!(rw, N; Δn=1)
+function trajectory!(rw::RandomWalker, N; Δn=1)
 	X = Vector{Float64}(undef, Int(floor(N/Δn)) + 1)
 	n = 0
 	i = 1
@@ -62,5 +51,5 @@ function trajectory!(rw, N; Δn=1)
 		n += Δn
 	end
 
-	return X, 0:Δn:N
+	return (x=X, t=0:Δn:N, final=nothing)
 end

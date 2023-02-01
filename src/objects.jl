@@ -20,7 +20,7 @@ t::Int = 0
 x::Float64 = 0.
 ```
 """
-@with_kw mutable struct EFRW <: RandomWalker
+Base.@kwdef mutable struct EFRW <: RandomWalker
 	β::Distribution = Dirac(0.5)
 	ρ::Float64 = 1.
 	μ::Float64 = 0.
@@ -53,14 +53,11 @@ function step!(rw::EFRW)
 	end
 
 	# Partial sweep
-	p = rand()
-	if p < rw.ρ # Is there a partial sweep?
-		p = rand()
-		βval = rand(rw.β)
-		if p <= rw.x
-			rw.x += βval * (1. - rw.x)
+	if rw.ρ >= 1 || rand() < rw.ρ # Is there a partial sweep?
+		if rand() <= rw.x
+			rw.x += rand(rw.β) * (1. - rw.x)
 		else
-			rw.x -= βval * rw.x
+			rw.x -= rand(rw.β) * rw.x
 		end
 	end
 
@@ -70,7 +67,8 @@ function step!(rw::EFRW)
 	end
 
 	rw.t += 1
-	return rw
+
+	return nothing
 end
 
 position(rw::EFRW) = rw.x
@@ -81,7 +79,7 @@ pos(rw::EFRW) = rw.x
 ######################### Neutral random walk ########################
 ######################################################################
 
-@with_kw mutable struct NeutralRW <: RandomWalker
+Base.@kwdef mutable struct NeutralRW <: RandomWalker
 	N::Int = 100
 	t::Int = 0
 	x::Float64 = 0.5
@@ -89,8 +87,8 @@ end
 
 function step!(rw::NeutralRW)
 	rw.x = rand(Binomial(rw.N, rw.x)) / rw.N
-	rw.t = 1
-	return rw
+	rw.t += 1
+	return nothing
 end
 
 position(rw::NeutralRW) = rw.x
@@ -107,7 +105,7 @@ pos(rw::NeutralRW) = rw.x
 		n::Int = 10
 	)
 """
-@with_kw mutable struct NeutralCoalescent <: RandomWalker
+Base.@kwdef mutable struct NeutralCoalescent <: RandomWalker
 	N::Int = 1000
 	t::Int = 0
 	n::Int = 10
@@ -134,7 +132,7 @@ function step!(rw::NeutralCoalescent)
 		rw.n = 1
 	end
 
-	return rw
+	return nothing
 end
 
 position(rw::NeutralCoalescent) = rw.n
@@ -150,7 +148,7 @@ pos(rw::NeutralCoalescent) = position(rw)
 		n::Int = 10
 	)
 """
-@with_kw mutable struct EFCoalescent <: RandomWalker
+Base.@kwdef mutable struct EFCoalescent <: RandomWalker
 	N::Float64 = Inf
 	β::Float64 = 0.5
 	ρ::Float64 = 0.05
@@ -175,54 +173,10 @@ function step!(rw::EFCoalescent)
 		rw.n = 1
 	end
 
-	return rw
+	return nothing
 end
 
 position(rw::EFCoalescent) = rw.n
 pos(rw::EFCoalescent) = position(rw)
 
-######################################################################
-######################### Boundary conditions ########################
-######################################################################
-const ABOVE = (:above, :right, :high, :up)
-const BELOW = (:below, :left, :low, :down)
 
-"""
-	struct AbsorbingBC{T}
-
-Absorbing boundary condition for a `RandomWalker`. The field `sense` can be \
-`$(ABOVE)` or `$(BELOW)`.
-
-## Fields
-
-```
-A::T
-sense::Symbol
-```
-"""
-struct AbsorbingBC{T}
-	A::T
-	sense::Symbol
-end
-
-
-function isabsorbed(rw::RandomWalker, ABCs::Vararg{AbsorbingBC})
-	for abc in ABCs
-		if isabsorbed(rw, abc)[1]
-			return true, abc
-		end
-	end
-	return false, nothing
-end
-function isabsorbed(rw::RandomWalker, ABC::AbsorbingBC)
-	if in(ABC.sense, ABOVE) && position(rw) >= ABC.A
-		return true, ABC
-	elseif in(ABC.sense, BELOW) && position(rw) <= ABC.A
-		return true, ABC
-	else
-		return false, nothing
-	end
-end
-
-natural_boundaries(::NeutralCoalescent) = AbsorbingBC(1, :down)
-natural_boundaries(::EFCoalescent) = AbsorbingBC(1, :down)
